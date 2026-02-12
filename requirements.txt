@@ -2,6 +2,8 @@ pytz
 requests
 streamlit
 pandas
+numpy
+pymongo
 scikit-learn
 xgboost
 mlflow

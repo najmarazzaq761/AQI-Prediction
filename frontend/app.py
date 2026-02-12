@@ -11,27 +11,18 @@ st.title("Real Time AQI Predictor")
 st.write("Predicts next 3 days AQI using latest trained models")
 
 # ===================== MLFLOW CONFIG =====================
-MONGO_URI = os.getenv("MONGO_URI")
-MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI")
-MLFLOW_TRACKING_USERNAME = os.getenv("MLFLOW_TRACKING_USERNAME")
-MLFLOW_TRACKING_PASSWORD = os.getenv("MLFLOW_TRACKING_PASSWORD")
+mlflow_username = os.getenv("MLFLOW_TRACKING_USERNAME")
+mlflow_password = os.getenv("MLFLOW_TRACKING_PASSWORD")
 
+if mlflow_username:
+    os.environ["MLFLOW_TRACKING_USERNAME"] = mlflow_username
+if mlflow_password:
+    os.environ["MLFLOW_TRACKING_PASSWORD"] = mlflow_password
+
+MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI")
 mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
-os.environ["MLFLOW_TRACKING_USERNAME"] = MLFLOW_TRACKING_USERNAME
-os.environ["MLFLOW_TRACKING_PASSWORD"] = MLFLOW_TRACKING_PASSWORD
 
 client = MlflowClient()
-experiment = client.search_experiments()[0]
-
-# ===================== HELPERS =====================
-def get_latest_run(run_name):
-    runs = client.search_runs(
-        experiment_ids=[experiment.experiment_id],
-        filter_string=f"attributes.run_name = '{run_name}'",
-        order_by=["attributes.start_time DESC"],
-        max_results=1
-    )
-    return runs[0] if runs else None
 
 # ===================== LOAD FEATURE STORE =====================
 from pymongo import MongoClient
@@ -56,43 +47,57 @@ collection = db["hourly_features"]
 
 df = pd.DataFrame(list(collection.find({}, {"_id": 0})))
 
-# ===================== MODEL METRICS =====================
-models_config = [
-    ("XGBoost", "XGBoost_72hr"),
-    ("MLP", "MLP_72hr"),
-    ("RandomForest", "rf_72hr")
-]
+
+# ===================== FETCH LATEST 3 REGISTRY VERSIONS =====================
+MODEL_NAME = "AQI_Forecaster"
+
+all_versions = client.search_model_versions(f"name='{MODEL_NAME}'")
+
+if len(all_versions) < 3:
+    st.error("Not enough model versions found.")
+    st.stop()
+
+# Sort versions descending
+versions_list = list(all_versions)
+versions_list.sort(key=lambda x: int(x.version), reverse=True)
+
+latest_three = versions_list[:3]
+
+# Because training order is:
+# XGBoost -> MLP -> RandomForest
+model_name_mapping = ["RandomForest", "MLP", "XGBoost"]
 
 models_info = []
 
-for display_name, run_name in models_config:
-    run = get_latest_run(run_name)
+for mv, display_name in zip(latest_three, model_name_mapping):
+    run = client.get_run(mv.run_id)
+    metrics = run.data.metrics
 
-    if run:
-        metrics = run.data.metrics
-        models_info.append({
-            "Model": display_name,
-            "MAE": metrics.get("MAE"),
-            "RMSE": metrics.get("RMSE"),
-            "MAPE": metrics.get("MAPE"),
-            "run_id": run.info.run_id
-        })
+    models_info.append({
+        "Model": display_name,
+        "MAE": metrics.get("MAE"),
+        "RMSE": metrics.get("RMSE"),
+        "MAPE": metrics.get("MAPE"),
+        "Version": int(mv.version)
+    })
 
 df_metrics = pd.DataFrame(models_info)
 
 st.subheader("Latest Model Performance")
-st.dataframe(df_metrics[["Model", "MAE", "RMSE", "MAPE"]])
+st.dataframe(df_metrics[["Model", "MAE", "RMSE", "MAPE", "Version"]])
 
 # ===================== SELECT BEST MODEL =====================
 best_row = df_metrics.sort_values("RMSE").iloc[0]
+
 best_model_name = best_row["Model"]
-best_run_id = best_row["run_id"]
+best_version = int(best_row["Version"])
 
 st.success(f"Best Model Selected: {best_model_name}")
 
-# ===================== LOAD BEST MODEL =====================
-model_uri = f"runs:/{best_run_id}/model"
+# ===================== LOAD BEST MODEL FROM REGISTRY =====================
+model_uri = f"models:/{MODEL_NAME}/{best_version}"
 best_model = mlflow.pyfunc.load_model(model_uri)
+
 
 # ===================== FUTURE FEATURE CREATION =====================
 def create_future_features(df, model):
@@ -133,6 +138,6 @@ if st.button("Predict Next 3 Days AQI"):
     day3 = sum(preds_72[48:72]) / 24
 
     st.subheader("AQI Forecast (Next 3 Days)")
-    st.write(f"Day 1 AQI: {day1:.2f}")
-    st.write(f"Day 2 AQI: {day2:.2f}")
-    st.write(f"Day 3 AQI: {day3:.2f}")
+    st.write(f"Day 1 AQI  :    {day1:.2f}")
+    st.write(f"Day 2 AQI  :    {day2:.2f}")
+    st.write(f"Day 3 AQI  :    {day3:.2f}")
