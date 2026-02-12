@@ -26,11 +26,10 @@ client = MongoClient(mongo_uri)
 db = client["aqi_feature_store"]
 collection = db["hourly_features"]
 
-# DROP COLLECTION
-collection.drop()
 
-# INSERT WITHOUT WORRYING ABOUT TIMESTAMP
+
 df = pd.read_csv("final_features.csv")
+
 records = df.to_dict(orient="records")
 collection.insert_many(records)
 

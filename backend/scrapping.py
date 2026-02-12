@@ -20,7 +20,7 @@ end_unix   = pkt_to_utc_unix("2026-01-25 00-00-00")
 
 lat = 30.746
 lon = 73.331
-API_KEY = os.getenv("API_KEY")
+API_KEY = os.getenv("AQI_API_KEY")
 
 file_name = "data.csv"
 file_exists = os.path.isfile(file_name)

@@ -1,0 +1,30 @@
+name: Hourly Data Pipeline
+
+on:
+  schedule:
+    - cron: '0 * * * *'   # Every hour (UTC)
+  workflow_dispatch:
+
+jobs:
+  hourly-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run hourly pipeline
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+          AQI_API_URL: ${{ secrets.AQI_API_URL }}
+        run: |
+          python automation/run_hourly_pipeline.py

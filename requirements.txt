@@ -1,2 +1,9 @@
 pytz
 requests
+streamlit
+pandas
+scikit-learn
+xgboost
+mlflow
+python-dotenv
+dagshub
