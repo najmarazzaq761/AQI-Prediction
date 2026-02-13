@@ -17,10 +17,12 @@ def fetch_latest_data():
     existing_timestamps = set(
         collection.distinct("timestamp")
     )
-
-    response = requests.get(API_URL)
+    url = f"https://api.openweathermap.org/data/2.5/air_pollution?lat=30.746&lon=73.331&appid={API_URL}"
+    
+    response = requests.get(url)
     response.raise_for_status()
     data = response.json()
+
 
     df = pd.DataFrame(data)
 
