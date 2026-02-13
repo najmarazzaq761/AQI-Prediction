@@ -26,5 +26,5 @@ jobs:
       - name: Run hourly pipeline
         env:
           MONGO_URI: ${{ secrets.MONGO_URI }}
-          AQI_API_URL: ${{ secrets.AQI_API_KEY }}
+          AQI_API_KEY: ${{ secrets.AQI_API_KEY }}
         run: python automation/run_hourly_pipeline.py
