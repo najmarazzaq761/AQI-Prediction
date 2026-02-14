@@ -7,21 +7,24 @@ from dotenv import load_dotenv
 load_dotenv()
 
 MONGO_URI = os.getenv("MONGO_URI")
-API_URL = os.getenv("AQI_API_KEY")
+API_KEY = os.getenv("AQI_API_KEY")
 
+LAT = 30.746
+LON = 73.331
+
+
+def get_mongo_client():
+    return MongoClient(MONGO_URI)
+
+
+# -------- Fetch new raw data from API --------
 def fetch_latest_data():
-    client = MongoClient(MONGO_URI)
-    db = client["aqi_feature_store"]
-    collection = db["hourly_features"]
+    url = f"https://api.openweathermap.org/data/2.5/air_pollution?lat={LAT}&lon={LON}&appid={API_KEY}"
 
-    existing_timestamps = set(
-        collection.distinct("timestamp")
-    )
-    url = f"https://api.openweathermap.org/data/2.5/air_pollution?lat=30.746&lon=73.331&appid={API_URL}"
-    
     response = requests.get(url)
     response.raise_for_status()
     data = response.json()
+
     records = data.get("list", [])
     rows = []
 
@@ -33,13 +36,23 @@ def fetch_latest_data():
         }
         rows.append(row)
 
-
     df = pd.DataFrame(rows)
-
-
-    if "timestamp" not in df.columns:
-        raise ValueError("timestamp column missing from API data")
-
-    df = df[~df["timestamp"].isin(existing_timestamps)]
-
     return df
+
+
+# -------- Fetch recent historical data from feature store --------
+def fetch_recent_raw_data(limit=30):
+    client = get_mongo_client()
+    db = client["aqi_feature_store"]
+    collection = db["hourly_features"]   # changed here
+
+    data = list(
+        collection.find({}, {"_id": 0, "timestamp": 1, "aqi": 1})
+        .sort("timestamp", -1)
+        .limit(limit)
+    )
+
+    if not data:
+        return pd.DataFrame()
+
+    return pd.DataFrame(data)
