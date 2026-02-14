@@ -34,7 +34,8 @@ def fetch_latest_data():
         rows.append(row)
 
 
-    df = pd.DataFrame(data)
+    df = pd.DataFrame(rows)
+
 
     if "timestamp" not in df.columns:
         raise ValueError("timestamp column missing from API data")
