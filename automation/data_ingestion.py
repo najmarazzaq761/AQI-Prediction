@@ -22,6 +22,16 @@ def fetch_latest_data():
     response = requests.get(url)
     response.raise_for_status()
     data = response.json()
+    records = data.get("list", [])
+    rows = []
+
+    for record in records:
+        row = {
+            "timestamp": record["dt"],
+            "aqi": record["main"]["aqi"],
+            **record["components"]
+        }
+        rows.append(row)
 
 
     df = pd.DataFrame(data)
