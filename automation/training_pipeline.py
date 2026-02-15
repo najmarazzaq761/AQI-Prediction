@@ -23,7 +23,7 @@ MONGO_URI = os.getenv("MONGO_URI")
 import mlflow
 import mlflow.sklearn
 
-mlflow.set_tracking_uri(os.environ["MLFLOW_TRACKING_URI"])
+mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI").strip())
 
 EXPERIMENT_NAME = "AQI_Training"
 mlflow.set_experiment(EXPERIMENT_NAME)
