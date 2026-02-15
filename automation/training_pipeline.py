@@ -12,21 +12,18 @@ from sklearn.neural_network import MLPRegressor
 
 
 import xgboost as xgb
+load_dotenv()
+
+# Set environment variables FIRST
+os.environ["MLFLOW_TRACKING_URI"] = os.getenv("MLFLOW_TRACKING_URI")
+os.environ["MLFLOW_TRACKING_USERNAME"] = os.getenv("MLFLOW_TRACKING_USERNAME")
+os.environ["MLFLOW_TRACKING_PASSWORD"] = os.getenv("MLFLOW_TRACKING_PASSWORD")
+MONGO_URI = os.getenv("MONGO_URI")
+
 import mlflow
 import mlflow.sklearn
 
-# Load environment variables
-
-load_dotenv()
-
-MONGO_URI = os.getenv("MONGO_URI")
-MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI")
-MLFLOW_TRACKING_USERNAME = os.getenv("MLFLOW_TRACKING_USERNAME")
-MLFLOW_TRACKING_PASSWORD = os.getenv("MLFLOW_TRACKING_PASSWORD")
-
-mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
-os.environ["MLFLOW_TRACKING_USERNAME"] = MLFLOW_TRACKING_USERNAME
-os.environ["MLFLOW_TRACKING_PASSWORD"] = MLFLOW_TRACKING_PASSWORD
+mlflow.set_tracking_uri(os.environ["MLFLOW_TRACKING_URI"])
 
 EXPERIMENT_NAME = "AQI_Training"
 mlflow.set_experiment(EXPERIMENT_NAME)
