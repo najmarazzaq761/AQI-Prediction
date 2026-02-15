@@ -11,13 +11,6 @@ st.title("Real Time AQI Predictor")
 st.write("Predicts next 3 days AQI using latest trained models")
 
 # ===================== MLFLOW CONFIG =====================
-mlflow_username = os.getenv("MLFLOW_TRACKING_USERNAME")
-mlflow_password = os.getenv("MLFLOW_TRACKING_PASSWORD")
-
-if mlflow_username:
-    os.environ["MLFLOW_TRACKING_USERNAME"] = mlflow_username
-if mlflow_password:
-    os.environ["MLFLOW_TRACKING_PASSWORD"] = mlflow_password
 
 MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI")
 mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
