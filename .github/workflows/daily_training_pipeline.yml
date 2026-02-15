@@ -5,6 +5,7 @@ on:
     - cron: '0 12 * * *'   # 5 PM Pakistan (UTC+5)
   workflow_dispatch:
 
+
 jobs:
   training:
     runs-on: ubuntu-latest
