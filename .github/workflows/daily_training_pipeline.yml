@@ -1,9 +1,11 @@
 name: Daily Training Pipeline
 
 on:
-  schedule:
-    - cron: '0 12 * * *'   # 5 PM Pakistan (UTC+5)
+  push:
+    branches:
+      - main
   workflow_dispatch:
+
 
 jobs:
   training:
