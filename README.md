@@ -1,6 +1,7 @@
 # AQI Predictor – Okara (3-Day AQI Forecasting System)
 ### Try Live Here: https://aqi-prediction-okaracity.streamlit.app/
 
+
 A complete end-to-end MLOps project that predicts **Air Quality Index (AQI) for the next 3 days (72 hours)** for **Okara, Pakistan**.
 
 The system includes:
@@ -310,3 +311,12 @@ It integrates:
 
 This is a full MLOps lifecycle implementation suitable for real-world deployment.
 
+## ✍️ Author
+
+**Najma Razzaq**  
+AI Engineer | [LinkedIn](https://www.linkedin.com/in/najmarazzaq)
+
+--- 
+
+## **License**  
+📜 APACHE License – Open for contributions!  
