@@ -9,6 +9,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.multioutput import MultiOutputRegressor
 from sklearn.neural_network import MLPRegressor
+import matplotlib.pyplot as plt
 
 
 import xgboost as xgb
@@ -101,8 +102,7 @@ def train_and_log(model, model_name, X_train, X_test, y_train, y_test):
     model.fit(X_train, y_train)
 
     # 6. shap analysis 
-    import matplotlib.pyplot as plt
-
+    
     if model_name == "XGBoost":
 
         # Take first target model from MultiOutput
