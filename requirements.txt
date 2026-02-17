@@ -5,7 +5,7 @@ pandas
 numpy
 pymongo
 scikit-learn
-xgboost
+xgboost==1.7.6
 mlflow
 python-dotenv
 dagshub
