@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from pymongo import MongoClient
 from dotenv import load_dotenv
-
+import shap
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from sklearn.ensemble import RandomForestRegressor
@@ -105,6 +105,30 @@ def evaluate(y_true, y_pred):
 # --------------------------------------------------
 def train_and_log(model, model_name, X_train, X_test, y_train, y_test):
     model.fit(X_train, y_train)
+
+    # shap analysis 
+        # ---------------- SHAP Analysis ----------------
+    import matplotlib.pyplot as plt
+
+    # SHAP only works for tree models (XGBoost / RF)
+    if hasattr(model, "estimators_"):
+        base_model = model.estimators_[0]   # first horizon model
+    else:
+        base_model = model
+
+    # Only run SHAP for tree-based models
+    if isinstance(base_model, (xgb.XGBRegressor, RandomForestRegressor)):
+        explainer = shap.TreeExplainer(base_model)
+        shap_values = explainer.shap_values(X_train)
+
+        plt.figure()
+        shap.summary_plot(shap_values, X_train, show=False)
+        plt.tight_layout()
+        plt.savefig("shap_summary.png")
+        plt.close()
+
+        mlflow.log_artifact("shap_summary.png")
+
 
     preds = model.predict(X_test)
 
