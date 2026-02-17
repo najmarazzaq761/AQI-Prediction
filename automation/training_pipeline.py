@@ -101,27 +101,28 @@ def train_and_log(model, model_name, X_train, X_test, y_train, y_test):
     model.fit(X_train, y_train)
 
     # 6. shap analysis 
-
+    # ---------------- SHAP Analysis ----------------
     import matplotlib.pyplot as plt
 
-    # SHAP only works for tree models (XGBoost / RF)
     if hasattr(model, "estimators_"):
-        base_model = model.estimators_[0]   # first horizon model
+        base_model = model.estimators_[0]
     else:
         base_model = model
 
-    # Only run SHAP for tree-based models
+    # Only run SHAP for tree models
     if isinstance(base_model, (xgb.XGBRegressor, RandomForestRegressor)):
-        explainer = shap.TreeExplainer(base_model)
-        shap_values = explainer.shap_values(X_train)
+
+        explainer = shap.Explainer(base_model, X_train)
+        shap_values = explainer(X_train)
 
         plt.figure()
-        shap.summary_plot(shap_values, X_train, show=False)
+        shap.plots.beeswarm(shap_values, show=False)
         plt.tight_layout()
         plt.savefig("shap_summary.png")
         plt.close()
 
         mlflow.log_artifact("shap_summary.png")
+
 
 
     preds = model.predict(X_test)
