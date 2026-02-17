@@ -26,10 +26,8 @@ mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI").strip())
 EXPERIMENT_NAME = "AQI_Training"
 mlflow.set_experiment(EXPERIMENT_NAME)
 
-
-# --------------------------------------------------
 # 1. Fetch features from MongoDB
-# --------------------------------------------------
+
 def load_features():
     client = MongoClient(MONGO_URI)
     db = client["aqi_feature_store"]
@@ -42,9 +40,8 @@ def load_features():
     return df
 
 
-# --------------------------------------------------
 # 2. Create 72-step direct multi-output target
-# --------------------------------------------------
+
 def create_multi_output_target(df, horizon=72):
     df = df.copy()
 
@@ -75,9 +72,8 @@ def create_multi_output_target(df, horizon=72):
     return X, y
 
 
-# --------------------------------------------------
 # 3. Time-based split
-# --------------------------------------------------
+
 def time_based_split(X, y, test_size=0.2):
     split_index = int(len(X) * (1 - test_size))
 
@@ -89,10 +85,8 @@ def time_based_split(X, y, test_size=0.2):
 
     return X_train, X_test, y_train, y_test
 
-
-# --------------------------------------------------
 # 4. Evaluation metrics
-# --------------------------------------------------
+
 def evaluate(y_true, y_pred):
     mae = mean_absolute_error(y_true, y_pred)
     rmse = np.sqrt(mean_squared_error(y_true, y_pred))
@@ -100,14 +94,14 @@ def evaluate(y_true, y_pred):
     return mae, rmse, mape
 
 
-# --------------------------------------------------
+
 # 5. Train and log model
-# --------------------------------------------------
+
 def train_and_log(model, model_name, X_train, X_test, y_train, y_test):
     model.fit(X_train, y_train)
 
-    # shap analysis 
-        # ---------------- SHAP Analysis ----------------
+    # 6. shap analysis 
+
     import matplotlib.pyplot as plt
 
     # SHAP only works for tree models (XGBoost / RF)
@@ -149,9 +143,9 @@ def train_and_log(model, model_name, X_train, X_test, y_train, y_test):
         )
 
 
-# --------------------------------------------------
-# 6. Main training pipeline
-# --------------------------------------------------
+
+# 7. Main training pipeline
+
 def main():
     print("Loading features...")
     df = load_features()
