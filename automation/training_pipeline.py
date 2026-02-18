@@ -103,23 +103,23 @@ def train_and_log(model, model_name, X_train, X_test, y_train, y_test):
 
     # 6. shap analysis 
     
-    if model_name == "XGBoost":
+    try:
+        if model_name == "XGBoost":
+            xgb_model = model.estimators_[0]
+            explainer = shap.TreeExplainer(xgb_model)
+            shap_values = explainer.shap_values(X_train)
 
-        # Take first target model from MultiOutput
-        xgb_model = model.estimators_[0]
+            plt.figure()
+            shap.summary_plot(shap_values, X_train, show=False)
+            plt.tight_layout()
+            plt.savefig("shap_summary.png")
+            plt.close()
 
-        booster = xgb_model.get_booster()
+            mlflow.log_artifact("shap_summary.png")
 
-        explainer = shap.TreeExplainer(booster)
-        shap_values = explainer.shap_values(X_train)
+    except Exception as e:
+        print("SHAP failed:", e)
 
-        plt.figure()
-        shap.summary_plot(shap_values, X_train, show=False)
-        plt.tight_layout()
-        plt.savefig("shap_summary.png")
-        plt.close()
-
-        mlflow.log_artifact("shap_summary.png")
 
     preds = model.predict(X_test)
 
