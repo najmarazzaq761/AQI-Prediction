@@ -12,6 +12,7 @@ The system includes:
 * Feature storage in MongoDB
 * Model training with MLflow tracking
 * registry for version control
+* Shap Analysis for feature importance explaination
 * CI/CD pipelines using GitHub Actions
 * Web application deployment using Streamlit
 
