@@ -21,19 +21,15 @@ client = MongoClient(mongo_uri)
 
 # print(client.list_database_names())
 
-
-
 db = client["aqi_feature_store"]
 collection = db["hourly_features"]
-
-
 
 df = pd.read_csv("final_features.csv")
 
 records = df.to_dict(orient="records")
 collection.insert_many(records)
 
-# Prevent duplicates (run once)
+# Prevent duplicates
 collection.create_index("timestamp", unique=True)
 print("Data inserted into MongoDB successfully.")
 

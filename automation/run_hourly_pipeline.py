@@ -16,7 +16,7 @@ def main():
         return
 
     print("Fetching historical data from feature store...")
-    history_df = fetch_recent_raw_data(limit=30)
+    history_df = fetch_recent_raw_data(limit=25)
 
     combined_df = pd.concat([history_df, new_raw_df])
     combined_df = combined_df.drop_duplicates("timestamp")
@@ -25,9 +25,9 @@ def main():
     print("Creating features...")
     feature_df = create_features(combined_df)
 
-    if feature_df.empty:
-        print("Not enough history for lag features yet.")
-        return
+    # if feature_df.empty:
+    #     print("Not enough history for lag features yet.")
+    #     return
 
     latest_feature = feature_df.sort_values("timestamp").tail(1)
 

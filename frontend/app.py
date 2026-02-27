@@ -45,9 +45,9 @@ MODEL_NAME = "AQI_Forecaster"
 
 all_versions = client.search_model_versions(f"name='{MODEL_NAME}'")
 
-if len(all_versions) < 3:
-    st.error("Not enough model versions found.")
-    st.stop()
+# if len(all_versions) < 3:
+#     st.error("Not enough model versions found.")
+#     st.stop()
 
 # Sort versions descending
 versions_list = list(all_versions)
@@ -55,8 +55,7 @@ versions_list.sort(key=lambda x: int(x.version), reverse=True)
 
 latest_three = versions_list[:3]
 
-# Because training order is:
-# XGBoost -> MLP -> RandomForest
+# Because training order is: XGBoost -> MLP -> RandomForest
 model_name_mapping = ["RandomForest", "MLP", "XGBoost"]
 
 models_info = []

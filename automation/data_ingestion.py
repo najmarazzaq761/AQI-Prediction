@@ -17,7 +17,7 @@ def get_mongo_client():
     return MongoClient(MONGO_URI)
 
 
-# -------- Fetch new raw data from API --------
+#  Fetch new raw data from API 
 def fetch_latest_data():
     url = f"https://api.openweathermap.org/data/2.5/air_pollution?lat={LAT}&lon={LON}&appid={API_KEY}"
 
@@ -40,11 +40,11 @@ def fetch_latest_data():
     return df
 
 
-# -------- Fetch recent historical data from feature store --------
-def fetch_recent_raw_data(limit=30):
+# Fetch recent historical data from feature store 
+def fetch_recent_raw_data(limit=25):
     client = get_mongo_client()
     db = client["aqi_feature_store"]
-    collection = db["hourly_features"]   # changed here
+    collection = db["hourly_features"] 
 
     data = list(
         collection.find({}, {"_id": 0, "timestamp": 1, "aqi": 1})

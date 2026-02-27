@@ -13,9 +13,8 @@ def pkt_to_utc_unix(time_str, fmt="%Y-%m-%d %H-%M-%S"):
     dt_pkt = pkt.localize(datetime.strptime(time_str, fmt))
     return int(dt_pkt.astimezone(timezone.utc).timestamp())
 
-# ---- time range ----
-# start_unix = pkt_to_utc_unix("2025-07-01 00-00-00")
-start_unix = pkt_to_utc_unix("2025-11-19 13-00-00")
+# time range 
+start_unix = pkt_to_utc_unix("2025-07-01 00-00-00")
 end_unix   = pkt_to_utc_unix("2026-01-25 00-00-00") 
 
 lat = 30.746

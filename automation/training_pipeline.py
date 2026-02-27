@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 import xgboost as xgb
 load_dotenv()
 
-# Set environment variables FIRST
+# Set environment variables 
 os.environ["MLFLOW_TRACKING_URI"] = os.getenv("MLFLOW_TRACKING_URI")
 MONGO_URI = os.getenv("MONGO_URI")
 
@@ -44,7 +44,7 @@ def load_features():
 # 2. Create 72-step direct multi-output target
 
 def create_multi_output_target(df, horizon=72):
-    df = df.copy()
+    # df = df.copy()
 
     for i in range(1, horizon + 1):
         df[f"target_t+{i}"] = df["aqi"].shift(-i)
@@ -93,7 +93,6 @@ def evaluate(y_true, y_pred):
     rmse = np.sqrt(mean_squared_error(y_true, y_pred))
     mape = np.mean(np.abs((y_true - y_pred) / y_true)) * 100
     return mae, rmse, mape
-
 
 
 # 5. Train and log model

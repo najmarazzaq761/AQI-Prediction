@@ -4,7 +4,6 @@ def create_features(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
 
        # Time based features
-    # Convert timestamp to datetime
     df['datetime'] = pd.to_datetime(df['timestamp'], unit='s')
 
     # Time components
@@ -33,7 +32,8 @@ def create_features(df: pd.DataFrame) -> pd.DataFrame:
         else: return 'Autumn'
 
     df['season'] = df['month'].apply(get_season)
-    # -------- Encode categorical features --------
+
+    # Encode categorical features 
     season_map = {
         "Spring": 0,
         "Summer": 1,
@@ -53,18 +53,18 @@ def create_features(df: pd.DataFrame) -> pd.DataFrame:
 
     df.drop(columns=["season", "time_of_day"], inplace=True)
 
-    # -------- Sort by time --------
+    #  Sort by time 
     df = df.sort_values("timestamp").reset_index(drop=True)
 
-    # -------- Lag features --------
+    # Lag features
     lags = [1, 2, 3, 6, 12, 24]
     for lag in lags:
         df[f"aqi_lag_{lag}"] = df["aqi"].shift(lag)
 
-    # -------- Rolling feature --------
+    #  Rolling feature 
     df["aqi_24hr_avg"] = df["aqi"].rolling(24).mean().round(2)
 
-    # -------- Final clean dataset --------
+    #  Final clean dataset 
     df = df.dropna().reset_index(drop=True)
 
     final_df = df[

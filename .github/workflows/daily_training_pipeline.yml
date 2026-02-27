@@ -6,8 +6,6 @@ on:
   workflow_dispatch:
 
 
-
-
 jobs:
   training:
     runs-on: ubuntu-latest
